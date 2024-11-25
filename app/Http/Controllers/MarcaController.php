@@ -15,13 +15,13 @@ class MarcaController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
         //$marcas = Marca::all();
         $marcas = $this->marca->all();
-        return $marcas;
+        return response()->json($marcas,200);
     }
 
 
@@ -30,28 +30,28 @@ class MarcaController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
         //$marca = Marca::create($request->all());
         $marca = $this->marca->create($request->all());
-        return $marca;
+        return response()->json($marca,201);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  Integer
-     * @return string[]
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
         $marca = $this->marca->find($id);
         if($marca === null){
-            return ['erro' => 'Recurso pesquisado não existe'];
+            return response()->json(['erro' => 'Recurso pesquisado não existe'],404); // json
         }
-        return $marca;
+        return response()->json($marca,200);
     }
 
 
@@ -60,33 +60,33 @@ class MarcaController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  Integer
-     * @return string[]
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
     {
         //$marca->update($request->all());
         $marca = $this->marca->find($id);
         if($marca === null){
-            return ['erro' => 'Impossivel realiza a atualizacao. O recurso solicitado não existe'];
+            return response()->json(['erro' => 'Impossivel realiza a atualizacao. O recurso solicitado não existe'],404);
         }
         $marca->update($request->all());
-        return $marca;
+        return response()->json($marca,200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  Integer
-     * @return string[]
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
         //$marca->delete();
         $marca = $this->marca->find($id);
         if($marca === null){
-            return ['erro' => 'Impossivel realiza a exclusao. O recurso solicitado não existe'];
+            return response()->json(['erro' => 'Impossivel realiza a exclusao. O recurso solicitado não existe'],404);
         }
         $marca->delete();
-        return ['msg' => "A marca foi removida com sucesso"];
+        return response()->json(['msg' => "A marca foi removida com sucesso"],200);
     }
 }
