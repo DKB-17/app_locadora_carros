@@ -96,7 +96,14 @@ class MarcaController extends Controller
             $request->validate($marca->rules(), $marca->feedback());
         }
 
-        $marca->update($request->all());
+        $image = $request->file('imagem');
+        $imagem_urn = $image->store('imagens', 'public');
+
+        $marca->update([
+            'nome' => $request->nome,
+            'imagem' => $imagem_urn,
+        ]);
+
         return response()->json($marca,200);
     }
 
