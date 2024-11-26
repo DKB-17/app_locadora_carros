@@ -39,7 +39,11 @@ class MarcaController extends Controller
         //stateless
         $request->validate($this->marca->rules(), $this->marca->feedback());
 
-        $marca = $this->marca->create($request->all());
+
+        $image = $request->file('imagem');
+        $image->store('imagens', 'public');
+
+        //$marca = $this->marca->create($request->all());
         return response()->json($marca,201);
     }
 
@@ -70,11 +74,24 @@ class MarcaController extends Controller
     {
         //$marca->update($request->all());
         $marca = $this->marca->find($id);
+
         if($marca === null){
             return response()->json(['erro' => 'Impossivel realiza a atualizacao. O recurso solicitado não existe'],404);
         }
 
-        $request->validate($marca->rules(), $marca->feedback());
+        if($request->method() === 'PATCH'){
+
+            $regrasDinamicas = array();
+            foreach($marca->rules() as $input => $regra){
+                 // coletar apenas as regras   aplicadas aos parametros parciais da requisicao PATCH
+                if(array_key_exists($input, $request->all())){
+                    $regrasDinamicas[$input] = $regra;
+                }
+            }
+            $request->validate($regrasDinamicas, $marca->feedback());
+        }else{
+            $request->validate($marca->rules(), $marca->feedback());
+        }
 
         $marca->update($request->all());
         return response()->json($marca,200);
