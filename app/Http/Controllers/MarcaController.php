@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Marca;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Type\Integer;
+use Illuminate\Support\Facades\Storage;
 
 class MarcaController extends Controller
 {
@@ -59,6 +60,7 @@ class MarcaController extends Controller
     public function show($id)
     {
         $marca = $this->marca->find($id);
+
         if($marca === null){
             return response()->json(['erro' => 'Recurso pesquisado não existe'],404); // json
         }
@@ -85,6 +87,7 @@ class MarcaController extends Controller
         if($request->method() === 'PATCH'){
 
             $regrasDinamicas = array();
+
             foreach($marca->rules() as $input => $regra){
                  // coletar apenas as regras   aplicadas aos parametros parciais da requisicao PATCH
                 if(array_key_exists($input, $request->all())){
@@ -96,12 +99,17 @@ class MarcaController extends Controller
             $request->validate($marca->rules(), $marca->feedback());
         }
 
+        // Remove o arquivo antigo caso um novo arquivo tenha sido enviado no request
+        if($request->file('imagem')){
+            Storage::disk('public')->delete($marca->imagem);
+        }
+
         $image = $request->file('imagem');
         $imagem_urn = $image->store('imagens', 'public');
 
         $marca->update([
-            'nome' => $request->nome,
-            'imagem' => $imagem_urn,
+            'nome' => $request->nome ?? $marca->nome,
+            'imagem' => $imagem_urn ?? $marca->image
         ]);
 
         return response()->json($marca,200);
@@ -120,6 +128,10 @@ class MarcaController extends Controller
         if($marca === null){
             return response()->json(['erro' => 'Impossivel realiza a exclusao. O recurso solicitado não existe'],404);
         }
+
+        // Remove a imagem no storage do disk, pasta public
+        Storage::disk('public')->delete($marca->imagem);
+
         $marca->delete();
         return response()->json(['msg' => "A marca foi removida com sucesso"],200);
     }
