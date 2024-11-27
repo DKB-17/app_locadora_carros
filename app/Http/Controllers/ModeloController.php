@@ -19,9 +19,20 @@ class ModeloController extends Controller
      *
      * @return JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json($this->modelo->with('marca')->get(),200);
+        $modelo = array();
+
+        if($request->has('atributos')){
+
+            $atributos = $request->atributos;
+            $modelos = $this->modelo->selectRaw($atributos)->with('marca')->get();
+
+        }else{
+            $modelos = $this->modelo->with('marca')->get();
+        }
+        return response()->json($modelo, 200);
+        //return response()->json($this->modelo->with('marca')->get(),200);
         // all() -> criando um obj de consulta + get() = collection
         // get() -> modificar a consulta -> collection
     }
