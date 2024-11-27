@@ -21,13 +21,13 @@ class ModeloController extends Controller
      */
     public function index(Request $request)
     {
-        $modelo = array();
+        $modelos = array();
 
         if($request->has('atributos_marca')){
-            $atributos_marca = $request->atributoss_marca;
-            $modelos = $this-modelo->with('marca:id,'.$atributos_marca);
+            $atributos_marca = $request->atributos_marca;
+            $modelos = $this->modelo->with('marca:id,'.$atributos_marca);
         }else{
-            $modelo = $this-modelo->with('marca');
+            $modelos = $this->modelo->with('marca');
         }
 
         if($request->has('filtro')){
@@ -39,14 +39,13 @@ class ModeloController extends Controller
         }
 
         if($request->has('atributos')){
-
             $atributos = $request->atributos;
             $modelos = $modelos->selectRaw($atributos)->get();
 
         }else{
             $modelos = $modelos->get();
         }
-        return response()->json($modelo, 200);
+        return response()->json($modelos, 200);
         //return response()->json($this->modelo->with('marca')->get(),200);
         // all() -> criando um obj de consulta + get() = collection
         // get() -> modificar a consulta -> collection
